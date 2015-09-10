@@ -15,7 +15,6 @@ import (
 	amqp "github.com/streadway/amqp"
 )
 
-type AmqpOutput struct {
 func init() {
 	outputs.RegisterOutputPlugin("amqp", AmqpOutputPlugin{})
 }
@@ -35,6 +34,7 @@ func (f AmqpOutputPlugin) NewOutput(
 	return output, nil
 }
 
+type amqpOutput struct {
 	Index string
 	Chan  *amqp.Channel
 
@@ -58,12 +58,12 @@ type AmqpExchange struct {
     DeliveryMode    int
 }
 
-type AmqpQueueMsg struct {
+type message struct {
 	index string
 	msg   string
 }
 
-func (out *AmqpOutput) Init(beat string, config outputs.MothershipConfig, topology_expire int) error {
+func (out *amqpOutput) Init(beat string, config outputs.MothershipConfig, topology_expire int) error {
 
 	out.AmqpUrl = config.AmqpUrl
 
@@ -111,7 +111,7 @@ func (out *AmqpOutput) Init(beat string, config outputs.MothershipConfig, topolo
 	return nil
 }
 
-func (out *AmqpOutput) AmqpConnect(out AmqpOutput) (amqp.Channel, error) {
+func (out *amqpOutput) AmqpConnect(out amqpOutput) (amqp.Channel, error) {
 	var conn *amqp.Connection
     var channel *amqp.Channel
     var err error
@@ -139,7 +139,7 @@ func (out *AmqpOutput) AmqpConnect(out AmqpOutput) (amqp.Channel, error) {
 	return channel, nil
 }
 
-func (out *AmqpOutput) Connect() error {
+func (out *amqpOutput) Connect() error {
 	var err error
 	out.Chan, err = out.AmqpConnect(out)
 	if err != nil {
@@ -150,11 +150,11 @@ func (out *AmqpOutput) Connect() error {
 	return nil
 }
 
-func (out *AmqpOutput) Close() {
+func (out *amqpOutput) Close() {
 	out.Conn.Close()
 }
 
-func (out *AmqpOutput) SendMessagesGoroutine() {
+func (out *amqpOutput) SendMessagesGoroutine() {
 
 	var err error
 	
@@ -189,7 +189,7 @@ func (out *AmqpOutput) SendMessagesGoroutine() {
 	}
 }
 
-func (out *AmqpOutput) Reconnect() {
+func (out *amqpOutput) Reconnect() {
 
 	for {
 		err := out.Connect()
@@ -212,7 +212,7 @@ func (out *FileOutput) GetNameByIP(ip string) string {
     return ""
 }
 
-func (out *AmqpOutput) PublishEvent(ts time.Time, event common.MapStr) error {
+func (out *amqpOutput) PublishEvent(ts time.Time, event common.MapStr) error {
 
 	json_event, err := json.Marshal(event)
 	if err != nil {
