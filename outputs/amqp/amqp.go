@@ -16,6 +16,25 @@ import (
 )
 
 type AmqpOutput struct {
+func init() {
+	outputs.RegisterOutputPlugin("amqp", AmqpOutputPlugin{})
+}
+
+type AmqpOutputPlugin struct{}
+
+func (f AmqpOutputPlugin) NewOutput(
+	beat string,
+	config outputs.MothershipConfig,
+	topology_expire int,
+) (outputs.Outputer, error) {
+	output := &amqpOutput{}
+	err := output.Init(beat, config, topology_expire)
+	if err != nil {
+		return nil, err
+	}
+	return output, nil
+}
+
 	Index string
 	Chan  *amqp.Channel
 
