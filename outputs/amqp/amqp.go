@@ -202,12 +202,12 @@ func (out *amqpOutput) Reconnect() {
 	}
 }
 
-func (out *FileOutput) PublishIPs(name string, localAddrs []string) error {
+func (out *amqpOutput) PublishIPs(name string, localAddrs []string) error {
     // not supported by this output type
     return nil
 }
 
-func (out *FileOutput) GetNameByIP(ip string) string {
+func (out *amqpOutput) GetNameByIP(ip string) string {
     // not supported by this output type
     return ""
 }
